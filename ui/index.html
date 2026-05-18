@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid Glass Clipboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- CodeMirror 5 CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ── Title Bar ──────────────────────────────────────── -->
+    <div id="titlebar" class="pywebview-drag-region">
+      <h1>✦ Liquid Glass Clipboard</h1>
+      <div class="titlebar-controls">
+        <span class="kbd">⌥V</span>
+      </div>
+    </div>
+
+    <!-- ── Tabs ───────────────────────────────────────────── -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="history">📋 History</button>
+      <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <!-- ── History Panel ──────────────────────────────────── -->
+    <div id="panel-history" class="tab-panel active">
+      <div class="search-container">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input"
+                 placeholder="Search clips… (language, content)" autocomplete="off">
+        </div>
+      </div>
+      <div id="clip-list" class="clip-list"></div>
+    </div>
+
+    <!-- ── Settings Panel ─────────────────────────────────── -->
+    <div id="panel-settings" class="tab-panel">
+      <div class="settings-panel">
+        <!-- Appearance -->
+        <div class="settings-group">
+          <h3>Appearance</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Theme</span>
+              <span>Follow system or override</span>
+            </div>
+            <select id="setting-theme" class="select-input">
+              <option value="auto">Auto (System)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Blur Intensity</span>
+              <span>Background glass effect — <strong id="setting-blur-value">20px</strong></span>
+            </div>
+            <input type="range" id="setting-blur" class="range-input" min="0" max="50" value="20">
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Window Opacity</span>
+              <span>Background transparency — <strong id="setting-opacity-value">92%</strong></span>
+            </div>
+            <input type="range" id="setting-opacity" class="range-input" min="50" max="100" value="92">
+          </div>
+        </div>
+
+        <!-- Behavior -->
+        <div class="settings-group">
+          <h3>Behavior</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Auto-Trim Whitespace</span>
+              <span>Strip leading/trailing spaces from clips</span>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="setting-trim" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Max History Items</span>
+              <span>Number of clips to keep</span>
+            </div>
+            <input type="number" id="setting-max-history" class="select-input"
+                   min="10" max="200" value="50" style="width: 70px; text-align: center;">
+          </div>
+        </div>
+
+        <!-- Hotkey -->
+        <div class="settings-group">
+          <h3>Global Hotkey</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Show/Hide Shortcut</span>
+              <span>Press to record new hotkey</span>
+            </div>
+            <div id="setting-hotkey" class="hotkey-input">⌥ + V</div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-group">
+          <h3>Data</h3>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Clear All History</span>
+              <span>This action cannot be undone</span>
+            </div>
+            <button class="btn btn-danger" onclick="App.clearHistory()">Clear All</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Editor Overlay ─────────────────────────────────── -->
+    <div id="editor-panel" class="editor-panel hidden">
+      <div class="editor-header">
+        <h2>✏️ Edit Snippet — <span id="editor-lang">plaintext</span></h2>
+        <button class="btn" onclick="Editor.close()">✕ Close</button>
+      </div>
+      <div class="editor-body">
+        <div id="editor-container"></div>
+      </div>
+      <div class="editor-footer">
+        <button class="btn" onclick="Editor.close()">Cancel</button>
+        <button class="btn btn-accent" onclick="Editor.save()">💾 Save Changes</button>
+      </div>
+    </div>
+
+    <!-- ── Status Bar ─────────────────────────────────────── -->
+    <div id="statusbar">
+      <span><span class="status-dot"></span>Monitoring clipboard</span>
+      <span>⌥V to toggle • ↑↓ navigate • ↵ paste • Esc hide</span>
+    </div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────────────── -->
+  <div id="toast" class="toast"></div>
+
+  <!-- CodeMirror 5 Core & Modes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+
+  <script src="js/app.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/editor.js"></script>
+</body>
+</html>

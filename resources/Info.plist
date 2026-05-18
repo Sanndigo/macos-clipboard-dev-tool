@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Identity -->
+    <key>CFBundleName</key>
+    <string>Liquid Glass Clipboard</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Liquid Glass Clipboard</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.liquidglass.clipboard</string>
+
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleExecutable</key>
+    <string>LiquidGlassClipboard</string>
+
+    <!-- CRITICAL: Run as background app — no Dock icon, no Menu Bar -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <!-- macOS version support -->
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
+
+    <!-- High-resolution support -->
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <!-- Apple Silicon native support -->
+    <key>LSArchitecturePriority</key>
+    <array>
+        <string>arm64</string>
+        <string>x86_64</string>
+    </array>
+
+    <!-- Required permissions -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Liquid Glass Clipboard needs to simulate paste actions in other apps.</string>
+
+    <!-- Accessibility permission (for global hotkey via CGEvent tap) -->
+    <key>NSAccessibilityUsageDescription</key>
+    <string>Liquid Glass Clipboard needs accessibility access to register global hotkeys.</string>
+
+    <!-- Background operation -->
+    <key>NSSupportsAutomaticTermination</key>
+    <false/>
+
+    <key>NSSupportsSuddenTermination</key>
+    <false/>
+
+    <!-- Principal class for Cocoa -->
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+</dict>
+</plist>
