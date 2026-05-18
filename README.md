@@ -126,3 +126,6 @@ Settings are stored in `~/Library/Application Support/LiquidGlassClipboard/setti
 ## License
 
 MIT
+
+##DISCLAIMER
+All created by AI, that's unstable software and use it with caution
