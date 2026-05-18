@@ -6,6 +6,18 @@ Launches the pywebview window, clipboard monitor, and global hotkey listener.
 import os
 import sys
 import threading
+import traceback
+from pathlib import Path
+
+# -- CRASH LOGGER --
+LOG_FILE = Path.home() / "Desktop" / "lg_debug.log"
+def log_crash(exc_type, exc_value, exc_tb):
+    with open(LOG_FILE, "a") as f:
+        f.write("--- CRASH ---\n")
+        f.write("".join(traceback.format_exception(exc_type, exc_value, exc_tb)))
+        f.write("\n")
+sys.excepthook = log_crash
+
 import webview
 
 # Ensure the app package is importable
@@ -27,11 +39,63 @@ def get_ui_path() -> str:
     return os.path.join(base, 'ui', 'index.html')
 
 
+from Foundation import NSObject
+
+class MenuInjector(NSObject):
+    def injectMenu_(self, arg):
+        try:
+            from AppKit import NSApp, NSMenu, NSMenuItem
+            main_menu = NSMenu.alloc().init()
+            app_menu_item = NSMenuItem.alloc().init()
+            main_menu.addItem_(app_menu_item)
+            
+            edit_menu_item = NSMenuItem.alloc().init()
+            edit_menu_item.setTitle_("Edit")
+            edit_menu = NSMenu.alloc().initWithTitle_("Edit")
+            
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Undo", "undo:", "z")
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Redo", "redo:", "Z")
+            edit_menu.addItem_(NSMenuItem.separatorItem())
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Cut", "cut:", "x")
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Copy", "copy:", "c")
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Paste", "paste:", "v")
+            edit_menu.addItemWithTitle_action_keyEquivalent_("Select All", "selectAll:", "a")
+            
+            edit_menu_item.setSubmenu_(edit_menu)
+            main_menu.addItem_(edit_menu_item)
+            NSApp.setMainMenu_(main_menu)
+            print("✓ Successfully injected macOS main menu")
+        except Exception as e:
+            print(f"Failed to inject macOS menu: {e}")
+
+    def activateApp_(self, arg):
+        try:
+            from AppKit import NSApp
+            NSApp.activateIgnoringOtherApps_(True)
+        except Exception as e:
+            print(f"Failed to activate app: {e}")
+
+_menu_injector = MenuInjector.alloc().init()
+
+
 def main():
-    # ── Initialize core components ──────────────────────────
-    settings = Settings()
-    db = ClipboardDatabase(max_items=settings.get("max_history", 50))
-    api = ApiBridge(db=db, settings=settings)
+    try:
+        with open(LOG_FILE, "a") as f:
+            f.write(f"--- APP STARTED ---\nHome: {Path.home()}\n")
+            
+        # ── Initialize core components ──────────────────────────
+        settings = Settings()
+        db = ClipboardDatabase(max_items=settings.get("max_history", 50))
+        
+        with open(LOG_FILE, "a") as f:
+            f.write(f"Loaded {len(db.get_all())} items from DB\n")
+            
+        api = ApiBridge(db=db, settings=settings)
+    except Exception as e:
+        with open(LOG_FILE, "a") as f:
+            f.write(f"Error during init: {e}\n")
+            f.write(traceback.format_exc() + "\n")
+        return
 
     # Dock Icon is visible by default. (Removed LSUIElement stealth mode)
 
@@ -87,17 +151,18 @@ def main():
     def toggle_window():
         nonlocal is_visible
         try:
+            with open(LOG_FILE, "a") as f:
+                f.write(f"toggle_window called. is_visible={is_visible}\n")
+                
             if not is_visible:
                 window.restore()
                 window.show()
                 window.on_top = True
                 is_visible = True
-                # Bring app to front
-                try:
-                    from AppKit import NSApp
-                    NSApp.activateIgnoringOtherApps_(True)
-                except Exception:
-                    pass
+                
+                # Bring app to front safely on the main thread
+                _menu_injector.performSelectorOnMainThread_withObject_waitUntilDone_("activateApp:", None, False)
+                
                 # Refresh history
                 window.evaluate_js("App.loadHistory()")
                 # Focus the search input
@@ -108,10 +173,16 @@ def main():
         except Exception as e:
             print(f"Toggle error: {e}")
 
+    def async_toggle_window():
+        with open(LOG_FILE, "a") as f:
+            f.write("CGEventTap triggered hotkey!\n")
+        import threading
+        threading.Thread(target=toggle_window, daemon=True).start()
+
     hotkey = HotkeyManager(
         modifiers=settings.get("hotkey_modifiers", ["option"]),
         key=settings.get("hotkey_key", "v"),
-        callback=toggle_window,
+        callback=async_toggle_window,
     )
 
     def on_settings_changed(new_settings):
@@ -127,36 +198,10 @@ def main():
         hotkey.start()
         
         # Inject standard macOS Edit menu so Cmd+C/V/X and global hotkeys work properly
-        try:
-            from AppKit import NSApp, NSMenu, NSMenuItem
-            main_menu = NSMenu.alloc().init()
-            app_menu_item = NSMenuItem.alloc().init()
-            main_menu.addItem_(app_menu_item)
-            
-            edit_menu_item = NSMenuItem.alloc().init()
-            edit_menu_item.setTitle_("Edit")
-            edit_menu = NSMenu.alloc().initWithTitle_("Edit")
-            
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Undo", "undo:", "z")
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Redo", "redo:", "Z")
-            edit_menu.addItem_(NSMenuItem.separatorItem())
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Cut", "cut:", "x")
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Copy", "copy:", "c")
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Paste", "paste:", "v")
-            edit_menu.addItemWithTitle_action_keyEquivalent_("Select All", "selectAll:", "a")
-            
-            edit_menu_item.setSubmenu_(edit_menu)
-            main_menu.addItem_(edit_menu_item)
-            NSApp.setMainMenu_(main_menu)
-        except Exception as e:
-            print(f"Failed to inject macOS menu: {e}")
+        _menu_injector.performSelectorOnMainThread_withObject_waitUntilDone_("injectMenu:", None, False)
 
         # Bring app to front initially
-        try:
-            from AppKit import NSApp
-            NSApp.activateIgnoringOtherApps_(True)
-        except Exception:
-            pass
+        _menu_injector.performSelectorOnMainThread_withObject_waitUntilDone_("activateApp:", None, False)
         # Auto-focus input initially
         window.evaluate_js("setTimeout(() => { const input = document.getElementById('search-input'); if (input) input.focus(); }, 100);")
         print("✅ Liquid Glass Clipboard Manager is running")

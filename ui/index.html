@@ -159,5 +159,15 @@
   <script src="js/app.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/editor.js"></script>
+  <script>
+    // Suppress macOS system beep for Option+key combos.
+    // WebKit treats Alt+key as inserting special chars (√, ©, etc.)
+    // which causes the error beep. We block only Alt-only combos here.
+    document.addEventListener('keydown', function(e) {
+      if (e.altKey && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+      }
+    }, true);
+  </script>
 </body>
 </html>

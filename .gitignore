@@ -44,3 +44,13 @@ Icon
 
 # Application specific (just in case they were dumped here)
 settings.json
+lg_debug.log
+
+# App builds
+Build/
+build/
+dist/
+
+# Scratch & Temporary
+test_icon.py
+resources/icon.iconset/

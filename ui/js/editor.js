@@ -57,10 +57,9 @@ const Editor = (() => {
     const newText = _view.getValue();
     try {
       await pywebview.api.update_item_text(_currentItem.id, newText);
-      _currentItem.text = newText;
-      if (window.App) {
-        window.App.renderClips();
-        window.App.toast('Saved!');
+      if (typeof App !== 'undefined') {
+        await App.loadHistory();
+        App.toast('Saved!');
       }
       close();
     } catch (e) {

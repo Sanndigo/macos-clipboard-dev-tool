@@ -33,7 +33,7 @@ const App = (() => {
       if (Editor && Editor.isOpen()) return;
       try {
         await pywebview.api.hide_window();
-      } catch (e) {}
+      } catch (e) { }
     });
 
     // Listen for new clips pushed from Python
@@ -72,7 +72,7 @@ const App = (() => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
       return clip.text.toLowerCase().includes(q) ||
-             clip.language.toLowerCase().includes(q);
+        clip.language.toLowerCase().includes(q);
     });
 
     if (filtered.length === 0) {
@@ -164,7 +164,7 @@ const App = (() => {
         if (Editor.isOpen()) {
           Editor.close();
         } else {
-          try { await pywebview.api.hide_window(); } catch (_) {}
+          try { await pywebview.api.hide_window(); } catch (_) { }
         }
         return;
       }
