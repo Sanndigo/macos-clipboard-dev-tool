@@ -5,9 +5,12 @@ Uses PyObjC's NSPasteboard to poll the system clipboard for changes.
 
 import threading
 import time
-import traceback
 
 from AppKit import NSPasteboard, NSStringPboardType
+
+from app.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class ClipboardMonitor:
@@ -21,19 +24,24 @@ class ClipboardMonitor:
         self._last_change_count = 0
 
     def start(self):
+        """Start polling the clipboard in a background thread."""
         if self._running:
             return
         self._running = True
         # Initialize with current change count so we don't capture stale data
         pb = NSPasteboard.generalPasteboard()
         self._last_change_count = pb.changeCount()
-        self._thread = threading.Thread(target=self._poll_loop, daemon=True)
+        self._thread = threading.Thread(
+            target=self._poll_loop, daemon=True, name="clipboard-monitor"
+        )
         self._thread.start()
 
     def stop(self):
+        """Signal the monitor thread to stop."""
         self._running = False
 
     def _poll_loop(self):
+        """Poll the clipboard for changes at the configured interval."""
         while self._running:
             try:
                 pb = NSPasteboard.generalPasteboard()
@@ -44,8 +52,8 @@ class ClipboardMonitor:
                     text = pb.stringForType_(NSStringPboardType)
                     if text and self._on_new_clip:
                         self._on_new_clip(str(text))
-            except Exception:
-                traceback.print_exc()
+            except Exception as e:
+                logger.error("Clipboard poll error: %s", e, exc_info=True)
 
             time.sleep(self._poll_interval)
 

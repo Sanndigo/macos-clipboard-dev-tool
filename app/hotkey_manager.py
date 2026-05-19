@@ -5,16 +5,7 @@ Requires Accessibility permissions on macOS.
 """
 
 import threading
-import traceback
-from pathlib import Path
-
-LOG_FILE = Path.home() / "Desktop" / "lg_debug.log"
-def log_debug(msg):
-    try:
-        with open(LOG_FILE, "a") as f:
-            f.write(msg + "\n")
-    except Exception:
-        pass
+import time
 
 from Quartz import (
     CGEventTapCreate,
@@ -36,6 +27,10 @@ from Quartz import (
     kCFRunLoopCommonModes,
     CFMachPortInvalidate,
 )
+
+from app.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 # macOS virtual keycodes
 KEYCODES = {
@@ -78,6 +73,9 @@ class HotkeyManager:
     This preserves the Accessibility permission grant across hotkey changes.
     """
 
+    # Maximum retry attempts for CGEventTap creation
+    _MAX_RETRY_ATTEMPTS = 60  # 2 minutes at 2s intervals
+
     def __init__(self, modifiers: list[str], key: str, callback):
         self._lock = threading.Lock()
         self._modifiers = list(modifiers)
@@ -118,25 +116,24 @@ class HotkeyManager:
                 return None  # Swallow the event
 
         except Exception as e:
-            log_debug(f"Error in event callback: {e}")
-            traceback.print_exc()
+            logger.error("Error in event callback: %s", e, exc_info=True)
 
         return event
 
     def start(self):
+        """Start the hotkey listener in a background thread."""
         if self._running:
             return
         self._running = True
-        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread = threading.Thread(target=self._run, daemon=True, name="hotkey-listener")
         self._thread.start()
 
     def _run(self):
-        import time
-        # Retry loop: attempt to create the CGEventTap every 2s until success.
-        # Handles the case where Accessibility is granted after the app launched.
+        """Run loop: retry creating CGEventTap until success or stopped."""
         tap = None
         attempt = 0
-        while self._running and tap is None:
+
+        while self._running and tap is None and attempt < self._MAX_RETRY_ATTEMPTS:
             attempt += 1
             try:
                 tap = CGEventTapCreate(
@@ -148,17 +145,26 @@ class HotkeyManager:
                     None,
                 )
             except Exception as e:
-                log_debug(f"CGEventTapCreate exception (attempt {attempt}): {e}")
-                traceback.print_exc()
+                logger.error("CGEventTapCreate exception (attempt %d): %s", attempt, e)
                 tap = None
 
             if tap is None:
-                log_debug(f"Tap not created (attempt {attempt}) — Accessibility not granted? Retrying in 2s...")
+                logger.info(
+                    "Tap not created (attempt %d/%d) — Accessibility not granted? Retrying in 2s...",
+                    attempt, self._MAX_RETRY_ATTEMPTS,
+                )
                 time.sleep(2)
             else:
-                log_debug(f"✓ CGEventTap created on attempt {attempt}")
+                logger.info("✓ CGEventTap created on attempt %d", attempt)
 
         if not self._running:
+            return
+
+        if tap is None:
+            logger.error(
+                "Failed to create CGEventTap after %d attempts. "
+                "Please grant Accessibility permissions.", self._MAX_RETRY_ATTEMPTS
+            )
             return
 
         try:
@@ -167,11 +173,12 @@ class HotkeyManager:
             CFRunLoopAddSource(self._run_loop, source, kCFRunLoopCommonModes)
             CFRunLoopRun()
             CFMachPortInvalidate(tap)
-            log_debug("CGEventTap run loop exited")
-        except Exception:
-            traceback.print_exc()
+            logger.info("CGEventTap run loop exited")
+        except Exception as e:
+            logger.error("Error in hotkey run loop: %s", e, exc_info=True)
 
     def stop(self):
+        """Stop the hotkey listener."""
         self._running = False
         if self._run_loop:
             CFRunLoopStop(self._run_loop)
@@ -184,8 +191,8 @@ class HotkeyManager:
         tap immediately starts matching the new combination.
         Accessibility permissions are fully preserved.
         """
-        log_debug(f"Updating hotkey to {modifiers} + {key}")
+        logger.info("Updating hotkey to %s + %s", modifiers, key)
         with self._lock:
             self._modifiers = list(modifiers)
             self._key = key
-        log_debug(f"Hotkey updated (tap alive): {modifiers} + {key}")
+        logger.info("Hotkey updated (tap alive): %s + %s", modifiers, key)

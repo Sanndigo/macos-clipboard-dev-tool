@@ -82,6 +82,23 @@ const Settings = (() => {
     }
   }
 
+  /**
+   * Update both hotkey modifiers and key in a single API call
+   * to prevent the intermediate inconsistent state bug.
+   */
+  async function updateHotkey(mods, key) {
+    _settings.hotkey_modifiers = mods;
+    _settings.hotkey_key = key;
+    try {
+      await pywebview.api.update_settings({
+        hotkey_modifiers: mods,
+        hotkey_key: key,
+      });
+    } catch (e) {
+      console.error('Failed to update hotkey:', e);
+    }
+  }
+
   let recordingHotkey = false;
 
   function bindEvents() {
@@ -94,7 +111,10 @@ const Settings = (() => {
         updateSetting('window_opacity', parseInt(e.target.value) / 100);
       }
       if (e.target.id === 'setting-max-history') {
-        updateSetting('max_history', parseInt(e.target.value));
+        const val = parseInt(e.target.value);
+        if (!isNaN(val) && val >= 10 && val <= 200) {
+          updateSetting('max_history', val);
+        }
       }
     });
 
@@ -148,8 +168,8 @@ const Settings = (() => {
         recordingHotkey = false;
         hotkeyDisplay.style.color = '';
 
-        updateSetting('hotkey_modifiers', mods);
-        updateSetting('hotkey_key', key);
+        // Single atomic API call for both modifiers and key
+        updateHotkey(mods, key);
         render();
       }, true); // Capture phase to prevent bubbling to global listeners
     }

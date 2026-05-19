@@ -10,16 +10,14 @@ def main():
     os.makedirs(resources_dir, exist_ok=True)
     os.makedirs(build_output_dir, exist_ok=True)
 
-    # 1. Copy the generated premium PNG icon
-    src_icon = "/Users/serafim/.gemini/antigravity/brain/b619a47e-cd08-423b-93c4-c13d0c9efb1d/app_icon_1779136952110.png"
+    # 1. Use the icon.png already in the resources directory
     dest_png = os.path.join(resources_dir, "icon.png")
-    
-    if os.path.exists(src_icon):
-        shutil.copy(src_icon, dest_png)
-        print("✓ Copied source PNG to resources/icon.png")
-    else:
-        print("⚠️ Source PNG icon not found. Make sure the path is correct.")
+
+    if not os.path.exists(dest_png):
+        print("⚠️ resources/icon.png not found. Please place your app icon there.")
         return
+
+    print("✓ Using existing resources/icon.png")
 
     # Force format conversion to true PNG using sips
     print("Converting source icon to native PNG format...")

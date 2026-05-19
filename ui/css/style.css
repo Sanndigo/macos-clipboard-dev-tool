@@ -435,14 +435,17 @@ html, body {
   flex-direction: column;
 }
 
-.editor-body .cm-editor {
+.editor-body .CodeMirror {
   flex: 1;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  height: 100%;
 }
 
-.editor-body .cm-editor.cm-focused {
+.editor-body .CodeMirror-focused {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
