@@ -43,12 +43,14 @@ const Editor = (() => {
       lineNumbers: true,
       matchBrackets: true,
       indentUnit: 4,
-      viewportMargin: Infinity,
     });
 
     // Focus editor after slight delay so rendering catches up
     setTimeout(() => {
-      if (_view) _view.focus();
+      if (_view) {
+        _view.refresh();
+        _view.focus();
+      }
     }, 50);
   }
 
