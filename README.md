@@ -112,7 +112,7 @@ ClipboardMacOS/
 ```
 
 ## Images
-<img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 02 55" src="https://github.com/user-attachments/assets/9b7e9998-7f67-4000-9390-96f0724ece52" /><img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 04 00" src="https://github.com/user-attachments/assets/d6432578-b218-45d7-b626-260a7e4a2eb9" />
+<img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 02 55" src="https://github.com/user-attachments/assets/9b7e9998-7f67-4000-9390-96f0724ece52" /><img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 04 00" src="https://github.com/user-attachments/assets/d6432578-b218-45d7-b626-260a7e4a2eb9" /><img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 16 14" src="https://github.com/user-attachments/assets/4d893aaa-f20f-4dce-b5b8-71ba8b7d36ec" />
 
 
 ## License
