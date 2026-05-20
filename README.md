@@ -1,6 +1,6 @@
 # ✦ Liquid Glass Clipboard Manager
 
-A premium, glassmorphism clipboard manager for macOS — built for developers.
+A glassmorphism clipboard manager for macOS — built for developers.
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-000?logo=apple)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python)
@@ -8,14 +8,14 @@ A premium, glassmorphism clipboard manager for macOS — built for developers.
 
 ## Features
 
-- **🔍 Smart Clipboard History** — Auto-detects 14+ programming languages with syntax-aware previews
-- **✏️ In-App Snippet Editor** — Edit any clip with rock-solid CodeMirror 5 (syntax highlighting, themes)
-- **⚡ Instant Activation** — `⌥V` shows/minimizes the window instantly (global hotkey via CGEvent tap)
-- **🫧 Liquid Glass UI** — Glassmorphism design with blur, transparency, and smooth animations
-- **🌗 Light & Dark Mode** — Automatically adapts to macOS system appearance
-- **📱 Native Desktop Feel** — Standard macOS Dock integration with full Main Menu support (Cmd+C/V works!)
-- **📌 Pin Important Clips** — Pin clips to prevent them from being evicted
-- **⌨️ Keyboard-First** — Arrow keys to navigate, Enter to paste, Escape to hide
+- ** Smart Clipboard History** — Auto-detects 14+ programming languages with syntax-aware previews
+- ** In-App Snippet Editor** — Edit any clip with rock-solid CodeMirror 5 (syntax highlighting, themes)
+- ** Instant Activation** — `⌥V` shows/minimizes the window instantly (global hotkey via CGEvent tap)
+- ** Liquid Glass UI** — Glassmorphism design with blur, transparency, and smooth animations
+- ** Light & Dark Mode** — Automatically adapts to macOS system appearance
+- ** Native Desktop Feel** — Standard macOS Dock integration with full Main Menu support (Cmd+C/V works!)
+- ** Pin Important Clips** — Pin clips to prevent them from being evicted
+- ** Keyboard-First** — Arrow keys to navigate, Enter to paste, Escape to hide
 
 ## Quick Start
 
@@ -111,21 +111,10 @@ ClipboardMacOS/
 └──────────────┴──────────────────────────────┘
 ```
 
-## Configuration
+## Images
+<img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 02 55" src="https://github.com/user-attachments/assets/9b7e9998-7f67-4000-9390-96f0724ece52" /><img width="1512" height="982" alt="Снимок экрана — 2026-05-21 в 00 04 00" src="https://github.com/user-attachments/assets/d6432578-b218-45d7-b626-260a7e4a2eb9" />
 
-Settings are stored in `~/Library/Application Support/LiquidGlassClipboard/settings.json`.
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `blur_intensity` | `20` | Backdrop blur in pixels |
-| `window_opacity` | `0.92` | Window background opacity |
-| `auto_trim_whitespace` | `true` | Strip whitespace from clips |
-| `max_history` | `50` | Maximum clips to retain |
-| `theme` | `auto` | `auto`, `light`, or `dark` |
 
 ## License
 
 MIT
-
-##DISCLAIMER
-All created by AI, that's unstable software and use it with caution
