@@ -19,7 +19,22 @@ const App = (() => {
 
   // ── Initialization ───────────────────────────────────────
   async function init() {
-    detectTheme();
+    // Load and apply all appearance settings first (theme, accent, font size, density, etc.)
+    let settings = {};
+    try {
+      settings = await pywebview.api.get_settings();
+    } catch (e) {
+      console.error('Failed to load initial settings:', e);
+    }
+
+    // Apply visual settings before rendering anything
+    if (typeof Settings !== 'undefined' && Settings.applyAll) {
+      Settings.applyAll(settings);
+    } else {
+      // Fallback: basic theme detection
+      detectTheme();
+    }
+
     await loadHistory();
     bindGlobalKeys();
     bindSearch();
@@ -45,7 +60,7 @@ const App = (() => {
     });
   }
 
-  // ── Theme Detection ──────────────────────────────────────
+  // ── Theme Detection (fallback when Settings not loaded yet) ──
   function detectTheme() {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const apply = (dark) => {
@@ -90,7 +105,7 @@ const App = (() => {
       emptyState.innerHTML = `
         <div class="icon">📋</div>
         <p>${searchQuery ? 'No matching clips found' : 'Clipboard history is empty'}<br>
-        <span style="font-size:11px; color: var(--text-tertiary)">
+        <span class="empty-state-subtitle">
           Copy something to get started
         </span></p>`;
       container.appendChild(emptyState);
@@ -146,7 +161,7 @@ const App = (() => {
 
     if (clip.pinned) {
       const pinIcon = document.createElement('span');
-      pinIcon.style.cssText = 'color: var(--pin-color); font-size: 12px;';
+      pinIcon.className = 'clip-pin';
       pinIcon.textContent = '📌';
       meta.appendChild(pinIcon);
     }

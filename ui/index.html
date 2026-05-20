@@ -57,6 +57,38 @@
           </div>
           <div class="setting-row">
             <div class="setting-label">
+              <span>Accent Color</span>
+              <span>macOS Tahoe palette</span>
+            </div>
+            <div id="setting-accent" class="accent-picker">
+              <div class="accent-swatch active" data-color="blue" title="Blue"></div>
+              <div class="accent-swatch" data-color="yellow" title="Yellow"></div>
+              <div class="accent-swatch" data-color="lilac" title="Lilac"></div>
+              <div class="accent-swatch" data-color="pink" title="Pink"></div>
+              <div class="accent-swatch" data-color="sky" title="Sky"></div>
+              <div class="accent-swatch" data-color="green" title="Green"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Font Size</span>
+              <span>Interface text size — <strong id="setting-font-size-value">13px</strong></span>
+            </div>
+            <input type="range" id="setting-font-size" class="range-input" min="12" max="16" value="13">
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>UI Density</span>
+              <span>Interface spacing & padding</span>
+            </div>
+            <select id="setting-density" class="select-input">
+              <option value="compact">Compact</option>
+              <option value="default">Default</option>
+              <option value="comfortable">Comfortable</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
               <span>Blur Intensity</span>
               <span>Background glass effect — <strong id="setting-blur-value">20px</strong></span>
             </div>

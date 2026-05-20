@@ -57,6 +57,9 @@
   --accent: #007AFF;
   --accent-hover: #0066DD;
   --accent-glow: rgba(0, 122, 255, 0.2);
+  --text-on-accent: #ffffff;
+  --titlebar-gradient-from: #007AFF;
+  --titlebar-gradient-to: #5856D6;
   --danger: #FF3B30;
   --danger-hover: #E0332A;
   --success: #34C759;
@@ -73,6 +76,9 @@
 
   --pin-color: #FF9500;
   --code-bg: rgba(0, 0, 0, 0.03);
+
+  /* Font & Density */
+  --font-size-base: 13px;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────── */
@@ -98,6 +104,9 @@
   --accent: #0A84FF;
   --accent-hover: #409CFF;
   --accent-glow: rgba(10, 132, 255, 0.25);
+  --text-on-accent: #ffffff;
+  --titlebar-gradient-from: #0A84FF;
+  --titlebar-gradient-to: #5E5CE6;
   --danger: #FF453A;
   --danger-hover: #FF6961;
   --success: #30D158;
@@ -114,6 +123,115 @@
   --code-bg: rgba(255, 255, 255, 0.04);
 }
 
+/* ── macOS Tahoe Accent Colors ────────────────────────────── */
+
+/* Yellow */
+[data-accent="yellow"] {
+  --accent: #FFD60A;
+  --accent-hover: #FFCC00;
+  --accent-glow: rgba(255, 214, 10, 0.25);
+  --shadow-glow: 0 0 20px rgba(255, 214, 10, 0.2);
+  --pin-color: #FFD60A;
+  --titlebar-gradient-from: #FFD60A;
+  --titlebar-gradient-to: #FFAA00;
+}
+[data-theme="light"][data-accent="yellow"] {
+  --text-on-accent: #1a1a00;
+}
+[data-theme="dark"][data-accent="yellow"] {
+  --text-on-accent: #1a1a00;
+}
+
+/* Lilac */
+[data-accent="lilac"] {
+  --accent: #BF5AF2;
+  --accent-hover: #A14FD0;
+  --accent-glow: rgba(191, 90, 242, 0.25);
+  --shadow-glow: 0 0 20px rgba(191, 90, 242, 0.2);
+  --pin-color: #BF5AF2;
+  --titlebar-gradient-from: #BF5AF2;
+  --titlebar-gradient-to: #8944C7;
+}
+[data-theme="dark"][data-accent="lilac"] {
+  --accent: #DA8FFF;
+  --accent-hover: #BF5AF2;
+  --accent-glow: rgba(218, 143, 255, 0.25);
+  --shadow-glow: 0 0 24px rgba(218, 143, 255, 0.2);
+  --text-on-accent: #1a0030;
+}
+
+/* Pink */
+[data-accent="pink"] {
+  --accent: #FF375F;
+  --accent-hover: #E02D50;
+  --accent-glow: rgba(255, 55, 95, 0.25);
+  --shadow-glow: 0 0 20px rgba(255, 55, 95, 0.2);
+  --pin-color: #FF375F;
+  --titlebar-gradient-from: #FF375F;
+  --titlebar-gradient-to: #FF2D55;
+}
+[data-theme="dark"][data-accent="pink"] {
+  --accent: #FF6482;
+  --accent-hover: #FF375F;
+  --accent-glow: rgba(255, 100, 130, 0.25);
+  --shadow-glow: 0 0 24px rgba(255, 100, 130, 0.2);
+}
+
+/* Sky */
+[data-accent="sky"] {
+  --accent: #5AC8FA;
+  --accent-hover: #4AB8E8;
+  --accent-glow: rgba(90, 200, 250, 0.25);
+  --shadow-glow: 0 0 20px rgba(90, 200, 250, 0.2);
+  --pin-color: #5AC8FA;
+  --titlebar-gradient-from: #5AC8FA;
+  --titlebar-gradient-to: #32ADE6;
+}
+[data-theme="light"][data-accent="sky"] {
+  --text-on-accent: #003050;
+}
+[data-theme="dark"][data-accent="sky"] {
+  --accent: #70D7FF;
+  --accent-hover: #5AC8FA;
+  --accent-glow: rgba(112, 215, 255, 0.25);
+  --shadow-glow: 0 0 24px rgba(112, 215, 255, 0.2);
+  --text-on-accent: #003050;
+}
+
+/* Green */
+[data-accent="green"] {
+  --accent: #34C759;
+  --accent-hover: #28B84C;
+  --accent-glow: rgba(52, 199, 89, 0.25);
+  --shadow-glow: 0 0 20px rgba(52, 199, 89, 0.2);
+  --pin-color: #34C759;
+  --titlebar-gradient-from: #34C759;
+  --titlebar-gradient-to: #30B050;
+}
+[data-theme="dark"][data-accent="green"] {
+  --accent: #30D158;
+  --accent-hover: #34C759;
+  --accent-glow: rgba(48, 209, 88, 0.25);
+  --shadow-glow: 0 0 24px rgba(48, 209, 88, 0.2);
+}
+
+/* ── UI Density ───────────────────────────────────────────── */
+[data-density="compact"] {
+  --space-xs: 2px;
+  --space-sm: 4px;
+  --space-md: 8px;
+  --space-lg: 12px;
+  --space-xl: 16px;
+}
+
+[data-density="comfortable"] {
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 28px;
+}
+
 /* ── Reset & Base ──────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0; padding: 0;
@@ -124,7 +242,7 @@ html, body {
   width: 100%; height: 100%;
   overflow: hidden;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: var(--font-size-base, 13px);
   line-height: 1.5;
   color: var(--text-primary);
   background: transparent;
@@ -162,9 +280,9 @@ html, body {
 }
 
 #titlebar h1 {
-  font-size: 14px; font-weight: 600;
+  font-size: 1.077rem; font-weight: 600;
   letter-spacing: -0.3px;
-  background: linear-gradient(135deg, var(--accent), #5856D6);
+  background: linear-gradient(135deg, var(--titlebar-gradient-from), var(--titlebar-gradient-to));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -184,7 +302,7 @@ html, body {
 
 .tab-btn {
   padding: var(--space-sm) var(--space-lg);
-  font-size: 12px; font-weight: 500;
+  font-size: 0.923rem; font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
   border: none; border-bottom: 2px solid transparent;
@@ -218,7 +336,7 @@ html, body {
 .search-icon {
   position: absolute; left: var(--space-md);
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 1.077rem;
   pointer-events: none;
 }
 
@@ -226,7 +344,7 @@ html, body {
   width: 100%;
   padding: var(--space-sm) var(--space-md) var(--space-sm) 36px;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--text-primary);
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
@@ -309,7 +427,7 @@ html, body {
 .clip-lang {
   display: inline-flex; align-items: center;
   padding: 2px 8px;
-  font-size: 10px; font-weight: 600;
+  font-size: 0.769rem; font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--accent);
@@ -318,7 +436,7 @@ html, body {
 }
 
 .clip-time {
-  font-size: 11px;
+  font-size: 0.846rem;
   color: var(--text-tertiary);
 }
 
@@ -332,7 +450,7 @@ html, body {
 
 .clip-preview {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.923rem;
   line-height: 1.6;
   color: var(--text-secondary);
   background: var(--code-bg);
@@ -359,7 +477,7 @@ html, body {
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-sm);
   font-family: var(--font-sans);
-  font-size: 11px; font-weight: 500;
+  font-size: 0.846rem; font-weight: 500;
   color: var(--text-secondary);
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
@@ -376,7 +494,7 @@ html, body {
 }
 
 .btn-accent {
-  color: var(--text-inverse);
+  color: var(--text-on-accent, var(--text-inverse));
   background: var(--accent);
   border-color: var(--accent);
 }
@@ -396,7 +514,7 @@ html, body {
   width: 28px; height: 28px;
   padding: 0;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 1.077rem;
 }
 
 /* ── Editor Panel ──────────────────────────────────────────── */
@@ -424,7 +542,7 @@ html, body {
 }
 
 .editor-header h2 {
-  font-size: 14px; font-weight: 600;
+  font-size: 1.077rem; font-weight: 600;
 }
 
 .editor-body {
@@ -449,7 +567,7 @@ html, body {
   overflow: hidden;
   border: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 1rem;
   height: 100%;
   min-height: 0;
 }
@@ -501,7 +619,7 @@ html, body {
 }
 
 .settings-group h3 {
-  font-size: 11px; font-weight: 600;
+  font-size: 0.846rem; font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-tertiary);
@@ -522,11 +640,11 @@ html, body {
 }
 
 .setting-label span:first-child {
-  font-size: 13px; font-weight: 500;
+  font-size: 1rem; font-weight: 500;
 }
 
 .setting-label span:last-child {
-  font-size: 11px;
+  font-size: 0.846rem;
   color: var(--text-tertiary);
 }
 
@@ -590,7 +708,7 @@ html, body {
 .select-input {
   padding: var(--space-xs) var(--space-sm);
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 0.923rem;
   color: var(--text-primary);
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
@@ -603,7 +721,7 @@ html, body {
 .hotkey-input {
   padding: var(--space-xs) var(--space-md);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.923rem;
   color: var(--accent);
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
@@ -636,12 +754,12 @@ html, body {
 }
 
 .empty-state .icon {
-  font-size: 48px;
+  font-size: 3.692rem;
   opacity: 0.4;
 }
 
 .empty-state p {
-  font-size: 13px;
+  font-size: 1rem;
   text-align: center;
 }
 
@@ -649,7 +767,7 @@ html, body {
 #statusbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--space-sm) var(--space-lg);
-  font-size: 11px;
+  font-size: 0.846rem;
   color: var(--text-tertiary);
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
@@ -680,7 +798,7 @@ html, body {
   padding: var(--space-sm) var(--space-lg);
   background: var(--accent);
   color: white;
-  font-size: 12px; font-weight: 500;
+  font-size: 0.923rem; font-weight: 500;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   opacity: 0;
@@ -704,9 +822,63 @@ html, body {
   min-width: 20px;
   padding: 1px 5px;
   font-family: var(--font-sans);
-  font-size: 10px; font-weight: 600;
+  font-size: 0.769rem; font-weight: 600;
   color: var(--text-tertiary);
   background: var(--bg-badge);
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
+}
+
+/* ── Accent Color Picker ──────────────────────────────────── */
+.accent-picker {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.accent-swatch {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.accent-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.accent-swatch.active {
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--bg-app), 0 0 0 4px var(--text-primary);
+}
+
+.accent-swatch[data-color="blue"] { background: #007AFF; }
+.accent-swatch[data-color="yellow"] { background: #FFD60A; }
+.accent-swatch[data-color="lilac"] { background: #BF5AF2; }
+.accent-swatch[data-color="pink"] { background: #FF375F; }
+.accent-swatch[data-color="sky"] { background: #5AC8FA; }
+.accent-swatch[data-color="green"] { background: #34C759; }
+
+/* ── Settings Panel Scrollbar ─────────────────────────────── */
+.settings-panel::-webkit-scrollbar { width: 6px; }
+.settings-panel::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+.settings-panel::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+/* ── Scalable Utilities ── */
+.clip-pin {
+  color: var(--pin-color);
+  font-size: 0.923rem;
+}
+
+.empty-state-subtitle {
+  font-size: 0.846rem;
+  color: var(--text-tertiary);
 }

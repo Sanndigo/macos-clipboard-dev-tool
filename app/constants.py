@@ -26,7 +26,10 @@ SETTINGS_DEFAULTS = {
     "window_opacity": 0.92,
     "auto_trim_whitespace": True,
     "max_history": 50,
-    "theme": "auto",  # "auto", "light", "dark"
+    "theme": "auto",       # "auto", "light", "dark"
+    "accent_color": "blue", # "blue", "yellow", "lilac", "pink", "sky", "green"
+    "font_size": 13,        # 12–16 px
+    "ui_density": "default", # "compact", "default", "comfortable"
 }
 
 # ── Allowed Settings Keys (whitelist for input validation) ──────

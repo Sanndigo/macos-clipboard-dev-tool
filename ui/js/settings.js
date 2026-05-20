@@ -40,6 +40,27 @@ const Settings = (() => {
     const themeSelect = document.getElementById('setting-theme');
     if (themeSelect) themeSelect.value = _settings.theme || 'auto';
 
+    // Accent Color
+    const accentPicker = document.getElementById('setting-accent');
+    if (accentPicker) {
+      const current = _settings.accent_color || 'blue';
+      accentPicker.querySelectorAll('.accent-swatch').forEach(swatch => {
+        swatch.classList.toggle('active', swatch.dataset.color === current);
+      });
+    }
+
+    // Font Size
+    const fontSizeSlider = document.getElementById('setting-font-size');
+    const fontSizeValue = document.getElementById('setting-font-size-value');
+    if (fontSizeSlider) {
+      fontSizeSlider.value = _settings.font_size || 13;
+      if (fontSizeValue) fontSizeValue.textContent = `${fontSizeSlider.value}px`;
+    }
+
+    // UI Density
+    const densitySelect = document.getElementById('setting-density');
+    if (densitySelect) densitySelect.value = _settings.ui_density || 'default';
+
     // Hotkey display
     const hotkeyDisplay = document.getElementById('setting-hotkey');
     if (hotkeyDisplay) {
@@ -73,12 +94,77 @@ const Settings = (() => {
       if (label) label.textContent = `${Math.round(value * 100)}%`;
     }
     if (key === 'theme') {
-      if (value === 'auto') {
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', value);
+      applyTheme(value);
+    }
+    if (key === 'accent_color') {
+      document.documentElement.setAttribute('data-accent', value);
+      // Update picker visual
+      const picker = document.getElementById('setting-accent');
+      if (picker) {
+        picker.querySelectorAll('.accent-swatch').forEach(s => {
+          s.classList.toggle('active', s.dataset.color === value);
+        });
       }
+    }
+    if (key === 'font_size') {
+      document.documentElement.style.setProperty('--font-size-base', `${value}px`);
+      const label = document.getElementById('setting-font-size-value');
+      if (label) label.textContent = `${value}px`;
+    }
+    if (key === 'ui_density') {
+      document.documentElement.setAttribute('data-density', value);
+    }
+  }
+
+  /**
+   * Apply the theme setting, respecting auto mode.
+   */
+  function applyTheme(value) {
+    if (value === 'auto') {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', value);
+    }
+  }
+
+  /**
+   * Apply all stored appearance settings to the DOM.
+   * Called once at startup by App.init().
+   */
+  function applyAll(settings) {
+    _settings = settings || _settings;
+
+    // Theme + listen for system changes
+    applyTheme(_settings.theme || 'auto');
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if ((_settings.theme || 'auto') === 'auto') {
+        applyTheme('auto');
+      }
+    });
+
+    // Accent
+    const accent = _settings.accent_color || 'blue';
+    document.documentElement.setAttribute('data-accent', accent);
+
+    // Font size
+    const fontSize = _settings.font_size || 13;
+    document.documentElement.style.setProperty('--font-size-base', `${fontSize}px`);
+
+    // UI Density
+    const density = _settings.ui_density || 'default';
+    document.documentElement.setAttribute('data-density', density);
+
+    // Blur
+    const blur = _settings.blur_intensity;
+    if (blur !== undefined) {
+      document.documentElement.style.setProperty('--blur-intensity', `${blur}px`);
+    }
+
+    // Opacity
+    const opacity = _settings.window_opacity;
+    if (opacity !== undefined) {
+      document.documentElement.style.setProperty('--window-opacity', opacity);
     }
   }
 
@@ -102,7 +188,7 @@ const Settings = (() => {
   let recordingHotkey = false;
 
   function bindEvents() {
-    // Blur slider
+    // Slider inputs (blur, opacity, font size)
     document.addEventListener('input', (e) => {
       if (e.target.id === 'setting-blur') {
         updateSetting('blur_intensity', parseInt(e.target.value));
@@ -116,6 +202,9 @@ const Settings = (() => {
           updateSetting('max_history', val);
         }
       }
+      if (e.target.id === 'setting-font-size') {
+        updateSetting('font_size', parseInt(e.target.value));
+      }
     });
 
     document.addEventListener('change', (e) => {
@@ -125,7 +214,21 @@ const Settings = (() => {
       if (e.target.id === 'setting-theme') {
         updateSetting('theme', e.target.value);
       }
+      if (e.target.id === 'setting-density') {
+        updateSetting('ui_density', e.target.value);
+      }
     });
+
+    // Accent color picker (delegated click on .accent-swatch)
+    const accentPicker = document.getElementById('setting-accent');
+    if (accentPicker) {
+      accentPicker.addEventListener('click', (e) => {
+        const swatch = e.target.closest('.accent-swatch');
+        if (!swatch) return;
+        const color = swatch.dataset.color;
+        if (color) updateSetting('accent_color', color);
+      });
+    }
 
     const hotkeyDisplay = document.getElementById('setting-hotkey');
     if (hotkeyDisplay) {
@@ -178,5 +281,5 @@ const Settings = (() => {
   // Init event bindings once
   document.addEventListener('DOMContentLoaded', bindEvents);
 
-  return { load, updateSetting };
+  return { load, updateSetting, applyAll };
 })();
