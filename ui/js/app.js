@@ -352,6 +352,9 @@ const App = (() => {
     _toastTimeout = setTimeout(() => el.classList.remove('show'), 2000);
   }
 
+  // ── Femboy Popup ─────────────────────────────────────────
+  // Native PyObjC overlay now used instead.
+
   // ── Utilities ────────────────────────────────────────────
   function formatTime(ts) {
     const now = Date.now() / 1000;

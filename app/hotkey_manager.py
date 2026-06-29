@@ -76,14 +76,18 @@ class HotkeyManager:
     # Maximum retry attempts for CGEventTap creation
     _MAX_RETRY_ATTEMPTS = 60  # 2 minutes at 2s intervals
 
-    def __init__(self, modifiers: list[str], key: str, callback):
+    def __init__(self, modifiers: list[str], key: str, callback, on_global_action=None):
         self._lock = threading.Lock()
         self._modifiers = list(modifiers)
         self._key = key
         self._callback = callback
+        self._on_global_action = on_global_action
         self._thread: threading.Thread | None = None
         self._run_loop = None
         self._running = False
+        
+        self._typing_count = 0
+        self._last_typing_time = 0.0
 
     def _compute_target_flags(self) -> int:
         """Must be called with self._lock held."""
@@ -100,20 +104,37 @@ class HotkeyManager:
                 return event
 
             keycode = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode)
+            flags = CGEventGetFlags(event)
+            active_mods = flags & MODIFIER_MASK
 
             with self._lock:
                 target_keycode = KEYCODES.get(self._key.lower())
                 target_flags = self._compute_target_flags()
 
-            if target_keycode is None or keycode != target_keycode:
-                return event
-
-            flags = CGEventGetFlags(event)
-            active_mods = flags & MODIFIER_MASK
-
-            if active_mods == target_flags:
+            # Check if it's the main toggle hotkey (swallowed)
+            if target_keycode is not None and keycode == target_keycode and active_mods == target_flags:
                 self._callback()
                 return None  # Swallow the event
+
+            # Check for global actions (Cmd+C: 0x08, Cmd+V: 0x09, Cmd+X: 0x07)
+            if active_mods == kCGEventFlagMaskCommand and keycode in (0x08, 0x09, 0x07):
+                if self._on_global_action:
+                    self._on_global_action()
+                return event
+
+            # Handle typing combo (only if no Cmd/Ctrl/Opt modifiers to avoid triggering on random shortcuts)
+            if not (active_mods & (kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate)):
+                now = time.time()
+                if now - self._last_typing_time > 2.0:
+                    self._typing_count = 0
+                
+                self._last_typing_time = now
+                self._typing_count += 1
+                
+                if self._typing_count >= 30:
+                    self._typing_count = 0
+                    if self._on_global_action:
+                        self._on_global_action()
 
         except Exception as e:
             logger.error("Error in event callback: %s", e, exc_info=True)

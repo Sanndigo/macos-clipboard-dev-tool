@@ -134,38 +134,7 @@ const Settings = (() => {
    */
   function applyAll(settings) {
     _settings = settings || _settings;
-
-    // Theme + listen for system changes
-    applyTheme(_settings.theme || 'auto');
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if ((_settings.theme || 'auto') === 'auto') {
-        applyTheme('auto');
-      }
-    });
-
-    // Accent
-    const accent = _settings.accent_color || 'blue';
-    document.documentElement.setAttribute('data-accent', accent);
-
-    // Font size
-    const fontSize = _settings.font_size || 13;
-    document.documentElement.style.setProperty('--font-size-base', `${fontSize}px`);
-
-    // UI Density
-    const density = _settings.ui_density || 'default';
-    document.documentElement.setAttribute('data-density', density);
-
-    // Blur
-    const blur = _settings.blur_intensity;
-    if (blur !== undefined) {
-      document.documentElement.style.setProperty('--blur-intensity', `${blur}px`);
-    }
-
-    // Opacity
-    const opacity = _settings.window_opacity;
-    if (opacity !== undefined) {
-      document.documentElement.style.setProperty('--window-opacity', opacity);
-    }
+    // Appearance settings removed for strict Femboy theme mode
   }
 
   /**

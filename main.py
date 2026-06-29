@@ -167,6 +167,9 @@ def main():
                 window.on_top = True
                 with _visibility_lock:
                     is_visible = True
+                
+                from app.overlay import show_femboy_overlay
+                show_femboy_overlay()
 
                 # Bring app to front safely on the main thread
                 _menu_injector.performSelectorOnMainThread_withObject_waitUntilDone_(
@@ -196,6 +199,8 @@ def main():
     _toggle_thread = threading.Thread(target=_toggle_worker, daemon=True, name="toggle-worker")
     _toggle_thread.start()
 
+    from app.overlay import show_femboy_overlay
+
     def async_toggle_window():
         """Signal the toggle worker instead of spawning a new thread each time."""
         logger.debug("CGEventTap triggered hotkey!")
@@ -205,6 +210,7 @@ def main():
         modifiers=settings.get("hotkey_modifiers", ["option"]),
         key=settings.get("hotkey_key", "v"),
         callback=async_toggle_window,
+        on_global_action=show_femboy_overlay
     )
 
     def on_settings_changed(new_settings):
